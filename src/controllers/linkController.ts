@@ -4,13 +4,11 @@ import { prismaClient } from "..";
 import { campaignSchema, addLinkToCampaignSchema, deleteLinkSchema, expandLinkSchema } from "../types/types";
 import { any, number } from "zod";
 
-// Function to generate shortened links
 const generateShortLinks = (count: number): string[] => {
     return Array.from({ length: count }, () => nanoid(6));
 };
 
 export const shortenLink = async (req: Request, res: Response) => {
-    // Validate request body
     const parsedData = campaignSchema.safeParse(req.body);
     if (!parsedData.success) {
         res.status(400).json({
@@ -23,15 +21,13 @@ export const shortenLink = async (req: Request, res: Response) => {
 
     try {
         const { camName, description, links } = parsedData.data;
-        const userId = req.userId; // Extracted from auth middleware
+        const userId = req.userId;
 
-        // Ensure links are just strings (not objects)
         if (!Array.isArray(links) || !links.every(link => typeof link === "string")) {
             res.status(400).json({ message: "Links should be an array of strings" });
             return;
         }
 
-        // Step 1: Create the campaign without links
         const campaign = await prismaClient.campaign.create({
             data: {
                 name: camName,
@@ -40,13 +36,11 @@ export const shortenLink = async (req: Request, res: Response) => {
             },
         });
 
-        // Step 2: Generate shortened links
         const shortLinks = generateShortLinks(links.length);
 
-        // Step 3: Insert shortened links into the database
         const createdLinks = await prismaClient.link.createMany({
             data: links.map((originalUrl, index) => ({
-                originalUrl, // Now explicitly ensured as a string
+                originalUrl,
                 shortUrl: shortLinks[index],
                 campaignId: campaign.id,
             })),
@@ -221,6 +215,64 @@ export const expandLink = async (req: Request, res: Response) => {
             message: "Internal Server Error",
             error,
         });
+        return;
+    }
+};
+
+
+export const getUserLinks = async (req: Request, res: Response) => {
+    try {
+        const userId = req.userId; 
+
+        if (!userId) {
+            res.status(400).json({ message: "User ID is required" });
+            return;
+        }
+
+        const campaigns = await prismaClient.campaign.findMany({
+            where: { userId: userId },
+            select: {
+                id: true,
+                name: true,
+                links: {
+                    select: {
+                        id: true,
+                        originalUrl: true,
+                        shortUrl: true,
+                        createdAt: true,
+                    },
+                },
+            },
+        });
+
+        if (campaigns.length === 0) {
+            res.status(404).json({ message: "No campaigns or links found for this user" });
+            return;
+        }
+
+        const formattedResponse = campaigns.map(campaign => ({
+            campaignId: campaign.id,
+            campaignName: campaign.name,
+            links: campaign.links.map(link => ({
+                linkId: link.id,
+                originalUrl: link.originalUrl,
+                shortUrl: link.shortUrl,
+                createdAt: link.createdAt,
+            })),
+        }));
+
+        res.status(200).json({
+            message: "User links retrieved successfully",
+            campaigns: formattedResponse,
+        });
+        return;
+    } catch (error) {
+        console.error("Error fetching user links:", error);
+        res.status(500).json({
+            message: "Internal Server Error",
+            error,
+        });
+
         return;
     }
 };
