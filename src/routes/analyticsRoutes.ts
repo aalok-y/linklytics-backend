@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { trackLinkMiddleware } from "../controllers/analyticsController";
 import { Request, Response } from "express";
+import { trackLinkMiddleware } from "../middlewares/analyticsMiddleware";
+
 
 const router = Router();
 
@@ -10,7 +11,7 @@ const hello = (req: Request, res: Response) => {
   });
 };
 
-router.get("/test", trackLinkMiddleware, hello);
+router.get("/test/:shortUrl", trackLinkMiddleware, hello);
 
 
 export default router;

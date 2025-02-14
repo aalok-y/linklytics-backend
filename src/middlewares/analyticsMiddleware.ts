@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import axios from "axios";
 import useragent from "useragent";
 import userAgentParser from "express-useragent";
+import { prismaClient } from "..";
+
 
 const IPINFO_API_KEY = process.env.IPINFO_API_KEY
 
@@ -90,3 +92,5 @@ export const trackLinkMiddleware = async (
 
   next();
 };
+
+

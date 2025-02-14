@@ -24,24 +24,39 @@ model User {
 }
 
 model Campaign {
-  id     Int  @id @default(autoincrement())
-  name String
+  id          Int      @id @default(autoincrement())
+  name        String
   description String?
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  links Link[]
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  links       Link[]
 }
 
-model Link{
+model Link {
   id          Int      @id @default(autoincrement())
-  campaignId  Int      // Foreign key to Campaign
-  originalUrl String   // The original long URL
+  campaignId  Int // Foreign key to Campaign
+  originalUrl String // The original long URL
   shortUrl    String   @unique // The shortened URL (unique)
   createdAt   DateTime @default(now())
 
-  campaign Campaign @relation(fields: [campaignId], references: [id]) 
+  campaign Campaign @relation(fields: [campaignId], references: [id])
 
+  analytics Analytics?
 }
 
-// @relation(fields: [authorId], references: [id])
+model Analytics {
+  id           Int      @id @default(autoincrement())
+  linkId       Int      @unique // Ensures one analytics entry per link
+  clicks       Int      @default(0)
+  lastAccessed DateTime @default(now())
+  ipAddress    String
+  country      String
+  region       String
+  city         String
+  deviceType   String
+  browser      String
+  os           String
+  updatedAt    DateTime @updatedAt // Tracks last update time
+  link         Link     @relation(fields: [linkId], references: [id])
+}

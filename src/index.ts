@@ -14,7 +14,7 @@ const port = process.env.PORT || 8000;
 
 export const prismaClient = new PrismaClient();
 
-app.use('/api/v1/',authRoutes);
+app.use('/api/v1',authRoutes);
 
 app.use('/api/v1',analyticsRoutes);
 
