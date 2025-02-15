@@ -1,1 +1,0 @@
-1. Fix: The IP of server is used everytime (Need to probably use client side fetching)
