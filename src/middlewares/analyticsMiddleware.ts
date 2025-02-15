@@ -50,10 +50,15 @@ export const trackLinkMiddleware = async (
       where: { shortUrl },
     });
 
+    (req as any).linkData = {
+      linkId: link?.id,
+      originalUrl: link?.originalUrl
+    }
+
     if (!link) {
       res.status(404).json({ message: "Short link not found" });
       return;
-    }
+    } 
 
     await prismaClient.link.update({
       where: { id: link.id },

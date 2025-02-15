@@ -4,7 +4,6 @@ import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/authRoutes"
 import linkRoutes from "./routes/linkRoutes"
 import { authenticateUser } from "./middlewares/authMiddleware";
-import analyticsRoutes from "./routes/analyticsRoutes"
 
 const app = express();
 app.use(cors());
@@ -16,16 +15,8 @@ export const prismaClient = new PrismaClient();
 
 app.use('/api/v1',authRoutes);
 
-app.use('/api/v1',analyticsRoutes);
 
-
-app.use(authenticateUser);
-
-
-app.use('/api/v1',linkRoutes);
-
-
-app.get('/',(req: Request, res: Response)=>{
+app.get('/status',(req: Request, res: Response)=>{
     const serverInfo = {
         NODE_ENV: process.env.NODE_ENV, // E.g., 'development', 'production', 'test'
         platform: process.platform,     // E.g., 'darwin', 'linux', 'win32'
@@ -42,6 +33,14 @@ app.get('/',(req: Request, res: Response)=>{
         serverInfo
     })
 })
+
+
+app.use(authenticateUser);
+
+
+app.use('/api/v1',linkRoutes);
+
+
 
 app.get('/protected', (req:Request, res: Response)=>{
     res.json({

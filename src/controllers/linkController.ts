@@ -276,3 +276,30 @@ export const getUserLinks = async (req: Request, res: Response) => {
         return;
     }
 };
+
+
+export const visitLink = async (req: Request, res: Response) => {
+    const shortUrl = req.params.shortUrl;
+    const redirectUrl = (req as any).linkData.originalUrl;
+    // const link = await prismaClient.link.findUnique({
+    //     where: { shortUrl },
+    // });
+
+    // if (!link) {
+    //     res.status(404).json({ message: "Link not found" });
+    //     return;
+    // }
+
+    try {
+        // Redirect to the original URL
+        res.redirect(redirectUrl);
+        return;
+    } catch (error) {
+        console.error("Error redirecting to link:", error);
+        res.status(500).json({
+            message: "Internal Server Error",
+            error
+        });
+        return;
+    }
+}   
