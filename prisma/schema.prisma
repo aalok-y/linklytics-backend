@@ -42,21 +42,22 @@ model Link {
 
   campaign Campaign @relation(fields: [campaignId], references: [id])
 
-  analytics Analytics?
+  analytics Analytics[]
+  clicks Int @default(0)
 }
 
 model Analytics {
   id           Int      @id @default(autoincrement())
-  linkId       Int      @unique // Ensures one analytics entry per link
-  clicks       Int      @default(0)
+  linkId       Int      
   lastAccessed DateTime @default(now())
   ipAddress    String
   country      String
   region       String
   city         String
-  deviceType   String
+  deviceType   String 
   browser      String
   os           String
   updatedAt    DateTime @updatedAt // Tracks last update time
   link         Link     @relation(fields: [linkId], references: [id])
 }
+
