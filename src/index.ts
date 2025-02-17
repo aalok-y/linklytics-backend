@@ -3,6 +3,7 @@ import cors from "cors"
 import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/authRoutes"
 import linkRoutes from "./routes/linkRoutes"
+import portfolioRoutes from "./routes/portfolioRoutes"
 import { authenticateUser } from "./middlewares/authMiddleware";
 
 const app = express();
@@ -18,13 +19,13 @@ app.use('/api/v1',authRoutes);
 
 app.get('/status',(req: Request, res: Response)=>{
     const serverInfo = {
-        NODE_ENV: process.env.NODE_ENV, // E.g., 'development', 'production', 'test'
-        platform: process.platform,     // E.g., 'darwin', 'linux', 'win32'
-        architecture: process.arch,     // E.g., 'x64', 'arm'
+        NODE_ENV: process.env.NODE_ENV, 
+        platform: process.platform,    
+        architecture: process.arch,     
         memoryUsage: process.memoryUsage(),
-        pid: process.pid,               // The current process ID
-        uptime: process.uptime(),       // Server uptime in seconds
-        version: process.version,       // Node.js version
+        pid: process.pid,               
+        uptime: process.uptime(),       
+        version: process.version,       
         hostname: require('os').hostname() 
     }
 
@@ -37,6 +38,7 @@ app.get('/status',(req: Request, res: Response)=>{
 
 app.use(authenticateUser);
 
+app.use('/api/v1/',portfolioRoutes);
 
 app.use('/api/v1',linkRoutes);
 
@@ -52,3 +54,4 @@ app.listen(port, ()=>{
     console.log("Server listening on :",port);
     
 })
+

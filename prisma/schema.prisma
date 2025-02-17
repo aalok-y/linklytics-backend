@@ -13,14 +13,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String?
-  username  String   @unique
-  password  String
-  createdAt DateTime @default(now())
+// model User {
+//   id        Int      @id @default(autoincrement())
+//   name      String?
+//   username  String   @unique
+//   password  String
+//   createdAt DateTime @default(now())
 
-  campaigns Campaign[]
+//   campaigns Campaign[]
+// }
+
+// model Campaign {
+//   id          Int      @id @default(autoincrement())
+//   name        String
+//   description String?
+//   userId      Int
+//   user        User     @relation(fields: [userId], references: [id])
+//   createdAt   DateTime @default(now())
+//   links       Link[]
+// }
+
+
+// model Portfolio {
+//   id          Int      @id @default(autoincrement())
+//   name String
+//   description String
+//   userId      Int
+//   user        User     @relation(fields: [userId], references: [id])
+//   createdAt   DateTime @default(now())
+//   linkId      Int
+//   link Link @relation(fields: [linkId], references: [id])
+
+// }
+
+
+
+
+// model Link {
+//   id          Int      @id @default(autoincrement())
+//   name        String   @default("link")
+//   campaignId  Int // Foreign key to Campaign
+//   originalUrl String // The original long URL
+//   shortUrl    String   @unique // The shortened URL (unique)
+//   createdAt   DateTime @default(now())
+
+//   campaign Campaign @relation(fields: [campaignId], references: [id])
+
+//   analytics Analytics[]
+//   clicks Int @default(0)
+// }
+
+// model Analytics {
+//   id           Int      @id @default(autoincrement())
+//   linkId       Int      
+//   lastAccessed DateTime @default(now())
+//   ipAddress    String
+//   country      String
+//   region       String
+//   city         String
+//   deviceType   String 
+//   browser      String
+//   os           String
+//   updatedAt    DateTime @updatedAt // Tracks last update time
+//   link         Link     @relation(fields: [linkId], references: [id])
+// }
+
+model User {
+  id        Int        @id @default(autoincrement())
+  name      String?
+  username  String     @unique
+  password  String
+  createdAt DateTime   @default(now())
+
+  campaigns  Campaign[]
+  portfolios Portfolio[]
 }
 
 model Campaign {
@@ -30,34 +96,84 @@ model Campaign {
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
+
   links       Link[]
+}
+
+model Portfolio {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+
+  portfolioLinks PortfolioLink[] // One Portfolio can have multiple PortfolioLinks
 }
 
 model Link {
   id          Int      @id @default(autoincrement())
-  campaignId  Int // Foreign key to Campaign
-  originalUrl String // The original long URL
+  name        String   @default("link")
+  campaignId  Int      // Foreign key to Campaign
+  originalUrl String   // The original long URL
   shortUrl    String   @unique // The shortened URL (unique)
   createdAt   DateTime @default(now())
 
-  campaign Campaign @relation(fields: [campaignId], references: [id])
+  campaign    Campaign @relation(fields: [campaignId], references: [id])
 
-  analytics Analytics[]
-  clicks Int @default(0)
+  analytics   Analytics[]
+  clicks      Int      @default(0)
 }
+
+model PortfolioLink {
+  id          Int      @id @default(autoincrement())
+  name        String   @default("link")
+  portfolioId Int      // Foreign key to Portfolio
+  originalUrl String   // The original long URL
+  shortUrl    String   @unique // The shortened URL (unique)
+  createdAt   DateTime @default(now())
+
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
+
+  analytics   Analytics[]
+  clicks      Int      @default(0)
+}
+
+// model Analytics {
+//   id           Int      @id @default(autoincrement())
+//   linkId       Int?
+//   portfolioLinkId Int?
+
+//   lastAccessed DateTime @default(now())
+//   ipAddress    String
+//   country      String
+//   region       String
+//   city         String
+//   deviceType   String 
+//   browser      String
+//   os           String
+//   updatedAt    DateTime @updatedAt // Tracks last update time
+
+//   link         Link?          @relation(fields: [linkId], references: [id])
+//   portfolioLink PortfolioLink? @relation(fields: [portfolioLinkId], references: [id])
+// }
 
 model Analytics {
-  id           Int      @id @default(autoincrement())
-  linkId       Int      
+  id          Int      @id @default(autoincrement())
+  linkId      Int?     // Nullable, since it may reference either Link or PortfolioLink
+  portfolioLinkId Int? // New field to reference PortfolioLink
+
   lastAccessed DateTime @default(now())
   ipAddress    String
-  country      String
-  region       String
-  city         String
-  deviceType   String 
-  browser      String
-  os           String
-  updatedAt    DateTime @updatedAt // Tracks last update time
-  link         Link     @relation(fields: [linkId], references: [id])
-}
+  country      String?
+  region       String?
+  city         String?
+  deviceType   String?
+  browser      String?
+  os           String?
+  updatedAt    DateTime @updatedAt
+  link         Link?         @relation(fields: [linkId], references: [id])
+  portfolioLink PortfolioLink? @relation(fields: [portfolioLinkId], references: [id])
 
+  @@unique([linkId, portfolioLinkId]) // Ensures a valid reference
+}

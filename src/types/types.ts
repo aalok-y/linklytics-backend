@@ -1,5 +1,5 @@
-import { link } from "fs";
 import { number, string, z } from "zod";
+
 
 export const SignupSchema = z.object({
   name: z.string(),
@@ -38,3 +38,14 @@ export const deleteLinkSchema = z.object({
 export const expandLinkSchema = z.object({
     shortLinks: z.array(string())
 })
+
+export const createPortfolioSchema = z.object({
+  portName: z.string().min(1, "Portfolio name is required"), // Ensures name is not empty
+  description: z.string().optional(), // Description is optional
+  links: z.array(
+    z.object({
+      name: z.string().min(1),
+      link: z.string().url() 
+    })
+  ).optional(), // Links are optional
+});

@@ -1,0 +1,7 @@
+1. Add name field to Link schema
+2. Autogenerate name when user does not specify in link controller (/shorten route)
+3. Update Portfolio controller accordingly
+
+
+
+IMP : Do prisma migration
