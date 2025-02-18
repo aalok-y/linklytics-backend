@@ -1,0 +1,2 @@
+1. Add endpoint to fetch all links in a portfolio
+2. Add ability to name custom name for shortlink

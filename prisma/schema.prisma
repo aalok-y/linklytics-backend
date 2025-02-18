@@ -116,8 +116,9 @@ model Link {
 
 
 model Portfolio {
-  id          Int      @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
+  endpoint    String  @unique
   description String?
   avatar      String?
   userId      Int
