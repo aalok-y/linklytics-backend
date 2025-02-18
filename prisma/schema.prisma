@@ -100,17 +100,6 @@ model Campaign {
   links       Link[]
 }
 
-model Portfolio {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-
-  portfolioLinks PortfolioLink[] // One Portfolio can have multiple PortfolioLinks
-}
-
 model Link {
   id          Int      @id @default(autoincrement())
   name        String   @default("link")
@@ -119,11 +108,25 @@ model Link {
   shortUrl    String   @unique // The shortened URL (unique)
   createdAt   DateTime @default(now())
 
-  campaign    Campaign @relation(fields: [campaignId], references: [id])
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   analytics   Analytics[]
   clicks      Int      @default(0)
 }
+
+
+model Portfolio {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  avatar      String?
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+
+  portfolioLinks PortfolioLink[] 
+}
+
 
 model PortfolioLink {
   id          Int      @id @default(autoincrement())
@@ -133,7 +136,7 @@ model PortfolioLink {
   shortUrl    String   @unique // The shortened URL (unique)
   createdAt   DateTime @default(now())
 
-  portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
 
   analytics   Analytics[]
   clicks      Int      @default(0)

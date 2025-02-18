@@ -38,7 +38,7 @@ app.get('/status',(req: Request, res: Response)=>{
 
 app.use(authenticateUser);
 
-app.use('/api/v1/',portfolioRoutes);
+app.use('/api/v1',portfolioRoutes);
 
 app.use('/api/v1',linkRoutes);
 

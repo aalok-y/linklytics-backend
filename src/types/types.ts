@@ -42,6 +42,18 @@ export const expandLinkSchema = z.object({
 export const createPortfolioSchema = z.object({
   portName: z.string().min(1, "Portfolio name is required"), // Ensures name is not empty
   description: z.string().optional(), // Description is optional
+  avatar: z.string().url().optional(),
+  links: z.array(
+    z.object({
+      name: z.string().min(1),
+      link: z.string().url() 
+    })
+  ).optional(), // Links are optional
+});
+
+export const updatePortfolioSchema = z.object({
+  portName: z.string().min(1, "Portfolio name is required"), // Ensures name is not empty
+  description: z.string().optional(), // Description is optional
   links: z.array(
     z.object({
       name: z.string().min(1),
