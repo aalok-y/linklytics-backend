@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { nanoid } from "nanoid";
 import { prismaClient } from "..";
 import { campaignSchema, addLinkToCampaignSchema, deleteLinkSchema, expandLinkSchema } from "../types/types";
-import { any, number } from "zod";
 
 const generateShortLinks = (count: number): string[] => {
     return Array.from({ length: count }, () => nanoid(6));
@@ -237,6 +236,7 @@ export const getUserLinks = async (req: Request, res: Response) => {
                 links: {
                     select: {
                         id: true,
+                        name: true,
                         originalUrl: true,
                         shortUrl: true,
                         createdAt: true,
@@ -255,6 +255,7 @@ export const getUserLinks = async (req: Request, res: Response) => {
             campaignName: campaign.name,
             links: campaign.links.map(link => ({
                 linkId: link.id,
+                linkName: link.name,
                 originalUrl: link.originalUrl,
                 shortUrl: link.shortUrl,
                 createdAt: link.createdAt,
@@ -303,3 +304,4 @@ export const visitLink = async (req: Request, res: Response) => {
         return;
     }
 }   
+

@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import authRoutes from "./routes/authRoutes"
 import linkRoutes from "./routes/linkRoutes"
 import portfolioRoutes from "./routes/portfolioRoutes"
+import analyticsRoutes from "./routes/analyticsRoutes"
 import { authenticateUser } from "./middlewares/authMiddleware";
 
 const app = express();
@@ -42,6 +43,7 @@ app.use('/api/v1',portfolioRoutes);
 
 app.use('/api/v1',linkRoutes);
 
+app.use('/api/v1',analyticsRoutes);
 
 
 app.get('/protected', (req:Request, res: Response)=>{

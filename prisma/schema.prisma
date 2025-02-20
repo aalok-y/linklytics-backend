@@ -143,24 +143,7 @@ model PortfolioLink {
   clicks      Int      @default(0)
 }
 
-// model Analytics {
-//   id           Int      @id @default(autoincrement())
-//   linkId       Int?
-//   portfolioLinkId Int?
 
-//   lastAccessed DateTime @default(now())
-//   ipAddress    String
-//   country      String
-//   region       String
-//   city         String
-//   deviceType   String 
-//   browser      String
-//   os           String
-//   updatedAt    DateTime @updatedAt // Tracks last update time
-
-//   link         Link?          @relation(fields: [linkId], references: [id])
-//   portfolioLink PortfolioLink? @relation(fields: [portfolioLinkId], references: [id])
-// }
 
 model Analytics {
   id          Int      @id @default(autoincrement())

@@ -4,10 +4,10 @@ import { trackLinkMiddleware } from "../middlewares/analyticsMiddleware";
 
 const router = Router();
 
-router.post('/expand',trackLinkMiddleware,expandLink)
-router.post('/shorten',trackLinkMiddleware,shortenLink);
-router.put('/shorten',addToCampaign)
+router.post('/expand', expandLink)
+router.post('/shorten', shortenLink);
+router.put('/shorten', addToCampaign)
 router.delete('/shorten', deleteLink);
-router.get('/links',getUserLinks);
-router.get('/:shortUrl',trackLinkMiddleware, visitLink);
+router.get('/links', getUserLinks);
+router.get('/:shortUrl', trackLinkMiddleware, visitLink);
 export default router;
