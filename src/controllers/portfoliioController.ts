@@ -195,3 +195,47 @@ export const getPortfolio = async (req: Request, res: Response): Promise<void> =
   }
 };
 
+export const getAllPortfolio = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = (req as any).userId;
+
+    const portfolios = await prismaClient.portfolio.findMany({
+      where: {
+        userId: userId
+      },
+      include: {
+        portfolioLinks: {
+          select: {
+            id: true,
+            name: true,
+            originalUrl: true,
+            shortUrl: true,
+            clicks: true,
+            createdAt: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // Transform the data to categorize links by portfolio
+    const portfoliosWithLinks = portfolios.map(portfolio => ({
+      id: portfolio.id,
+      name: portfolio.name,
+      description: portfolio.description,
+      endpoint: portfolio.endpoint,
+      avatar: portfolio.avatar,
+      createdAt: portfolio.createdAt,
+      links: portfolio.portfolioLinks
+    }));
+
+    res.status(200).json({
+      portfolios: portfoliosWithLinks
+    });
+  } catch (error) {
+    console.error("Error fetching portfolio:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : "An unknown error occurred" });
+  }
+}
