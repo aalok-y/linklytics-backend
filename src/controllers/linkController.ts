@@ -74,7 +74,7 @@ export const addToCampaign = async (req: Request, res: Response) => {
     }
 
     try {
-        const { camId, links } = parsedData.data;
+        const { camId, links, linkName } = parsedData.data;
 
         const campaign = await prismaClient.campaign.findUnique({
             where: { id: camId },
@@ -94,6 +94,7 @@ export const addToCampaign = async (req: Request, res: Response) => {
 
         await prismaClient.link.createMany({
             data: links.map((originalUrl, index) => ({
+                name: linkName,
                 originalUrl,
                 shortUrl: shortLinks[index],
                 campaignId: camId,

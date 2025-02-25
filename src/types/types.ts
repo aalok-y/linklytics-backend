@@ -29,6 +29,7 @@ export const campaignSchema = z.object({
 export const addLinkToCampaignSchema = z.object({
   camId: z.number(),
   links: z.array(z.string().url("Each link must be a valid URL")),
+  linkName: z.string()
 });
 
 export const deleteLinkSchema = z.object({
