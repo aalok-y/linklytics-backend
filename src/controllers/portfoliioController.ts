@@ -3,6 +3,16 @@ import {createPortfolioSchema, updatePortfolioSchema} from "../types/types"
 import { prismaClient } from "../index"; 
 import { nanoid } from "nanoid";
 
+interface Links {
+  title: string,
+  url: string
+}
+interface ViewData {
+  title: string,
+  avatar?: string,
+  links: Links[]
+}
+
 
 export const createPortfolio = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -236,6 +246,42 @@ export const getAllPortfolio = async (req: Request, res: Response): Promise<void
     res.status(200).json({
       portfolios: portfoliosWithLinks
     });
+  } catch (error) {
+    console.error("Error fetching portfolio:", error);
+    res.status(400).json({ error: error instanceof Error ? error.message : "An unknown error occurred" });
+  }
+}
+
+export const visitPortfolio = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const endpoint = req.params.endpoint;
+    
+    const portfolio = await prismaClient.portfolio.findUnique({
+      where: {
+        endpoint: endpoint
+      },include: {
+        portfolioLinks: true
+      }
+    });
+
+    if (!portfolio) {
+      res.status(404).json({ message: "Portfolio not found" });
+      return;
+    }
+    let data: ViewData = {
+      title: portfolio.name,
+      avatar: portfolio.avatar || '/user.png',
+      links: []
+    };
+    console.log('avatar:',data.avatar)
+    portfolio.portfolioLinks.forEach(link => {
+      data.links.push({
+        title: link.name,
+        url: link.shortUrl
+      })
+    })
+    res.status(200).render('portfolio', data);
+   
   } catch (error) {
     console.error("Error fetching portfolio:", error);
     res.status(400).json({ error: error instanceof Error ? error.message : "An unknown error occurred" });

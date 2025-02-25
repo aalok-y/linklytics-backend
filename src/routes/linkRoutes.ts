@@ -9,5 +9,5 @@ router.post('/shorten', shortenLink);
 router.put('/shorten', addToCampaign)
 router.delete('/shorten', deleteLink);
 router.get('/links', getUserLinks);
-router.get('/:shortUrl', trackLinkMiddleware, visitLink);
+// router.get('/:shortUrl', trackLinkMiddleware, visitLink);
 export default router;

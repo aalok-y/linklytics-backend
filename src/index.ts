@@ -1,22 +1,29 @@
-import express, {Request, Response} from "express"
-import cors from "cors"
+import express, { Request, Response } from "express";
+import cors from "cors";
 import { PrismaClient } from "@prisma/client";
+import path from 'path';
 import authRoutes from "./routes/authRoutes"
 import linkRoutes from "./routes/linkRoutes"
 import portfolioRoutes from "./routes/portfolioRoutes"
 import analyticsRoutes from "./routes/analyticsRoutes"
 import { authenticateUser } from "./middlewares/authMiddleware";
+import visitLinkRoutes from "./routes/linkVisitRoutes"
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '..', 'src', 'views'));
+
+// Serve static files first
+app.use(express.static(path.join(__dirname, '..', 'src', 'public')));
 
 const port = process.env.PORT || 8000;
 
 export const prismaClient = new PrismaClient();
 
 app.use('/api/v1',authRoutes);
-
 
 app.get('/status',(req: Request, res: Response)=>{
     const serverInfo = {
@@ -31,11 +38,14 @@ app.get('/status',(req: Request, res: Response)=>{
     }
 
     res.status(200).json({
-        message: "I'm alive 👍",
+        message: "I'm alive ",
         serverInfo
     })
+    return;
 })
 
+// Handle link visits after static files
+app.use('/',visitLinkRoutes)
 
 app.use(authenticateUser);
 
@@ -56,4 +66,3 @@ app.listen(port, ()=>{
     console.log("Server listening on :",port);
     
 })
-

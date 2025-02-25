@@ -283,14 +283,6 @@ export const getUserLinks = async (req: Request, res: Response) => {
 export const visitLink = async (req: Request, res: Response) => {
     const shortUrl = req.params.shortUrl;
     const redirectUrl = (req as any).linkData.originalUrl;
-    // const link = await prismaClient.link.findUnique({
-    //     where: { shortUrl },
-    // });
-
-    // if (!link) {
-    //     res.status(404).json({ message: "Link not found" });
-    //     return;
-    // }
 
     try {
         // Redirect to the original URL
