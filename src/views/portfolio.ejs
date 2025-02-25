@@ -22,7 +22,7 @@
             <div class="space-y-4">
                 <% links.forEach((link, index) => { %>
                     <a
-                        href="<%= link.url %>"
+                        href="<%='http://localhost:8000/' + link.url %>"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="block bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg"

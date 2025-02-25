@@ -38,7 +38,7 @@ app.get('/status',(req: Request, res: Response)=>{
     }
 
     res.status(200).json({
-        message: "I'm alive ",
+        message: "I'm alive👍",
         serverInfo
     })
     return;
