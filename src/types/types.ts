@@ -54,9 +54,9 @@ export const createPortfolioSchema = z.object({
 });
 
 export const updatePortfolioSchema = z.object({
-  portName: z.string().min(1, "Portfolio name is required"), // Ensures name is not empty
+  portName: z.string().min(1, "Portfolio name is required").optional(), // Ensures name is not empty
   description: z.string().optional(), // Description is optional
-  endpoint: z.string().min(3, "Custom endpoint must be at least 3 characters long"),
+  endpoint: z.string().min(3, "Custom endpoint must be at least 3 characters long").optional(),
   links: z.array(
     z.object({
       name: z.string().min(1),

@@ -115,7 +115,8 @@ export const updatePortfolio = async (req: Request, res: Response): Promise<void
       },
       data: {
         name: parsedData.portName,
-        description: parsedData.description
+        description: parsedData.description,
+        endpoint: parsedData.endpoint
       }
     });
 
@@ -204,6 +205,7 @@ export const getAllPortfolio = async (req: Request, res: Response): Promise<void
         userId: userId
       },
       include: {
+
         portfolioLinks: {
           select: {
             id: true,
