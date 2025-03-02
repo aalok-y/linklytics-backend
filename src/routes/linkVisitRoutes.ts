@@ -5,7 +5,7 @@ import { visitLink } from "../controllers/linkController";
 
 const router = Router();
 
-router.get('/p/:endpoint',visitPortfolio)
+router.get('/p/:endpoint',visitPortfolio);
 router.get('/:shortUrl', trackLinkMiddleware, visitLink);
 
 export default router;

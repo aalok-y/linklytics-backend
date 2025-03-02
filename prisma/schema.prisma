@@ -84,7 +84,7 @@ model User {
   username  String     @unique
   password  String
   createdAt DateTime   @default(now())
-
+  isVerified Boolean @default(false)
   campaigns  Campaign[]
   portfolios Portfolio[]
 }
@@ -96,7 +96,6 @@ model Campaign {
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
-
   links       Link[]
 }
 

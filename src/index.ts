@@ -8,6 +8,7 @@ import portfolioRoutes from "./routes/portfolioRoutes"
 import analyticsRoutes from "./routes/analyticsRoutes"
 import { authenticateUser } from "./middlewares/authMiddleware";
 import visitLinkRoutes from "./routes/linkVisitRoutes"
+import otpRoutes from "./routes/otpRoutes"
 
 const app = express();
 app.use(cors());
@@ -22,6 +23,8 @@ app.use(express.static(path.join(__dirname, '..', 'src', 'public')));
 const port = process.env.PORT || 8000;
 
 export const prismaClient = new PrismaClient();
+
+app.use('/api/v1',otpRoutes);
 
 app.use('/api/v1',authRoutes);
 
