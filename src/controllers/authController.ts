@@ -124,6 +124,7 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
   const token = generateToken(user?.id as number);
   res.status(200).json({
     token,
+    user: user?.name
   });
 };
 
