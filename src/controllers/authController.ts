@@ -6,12 +6,13 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { any } from "zod";
+import { error } from "console";
 
 const generateToken = (userId: number): string => {
   return jwt.sign({ userId: userId }, process.env.JWT_SECRET ?? "Super-Secret");
 };
 
-const sendOtpEmail = async (email: string, otp: string) => {
+const sendOtpEmail = async (email: string, subject: string, text: string) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -23,8 +24,8 @@ const sendOtpEmail = async (email: string, otp: string) => {
   await transporter.sendMail({
     from: `"Linklytics" <${process.env.EMAIL_USER}>`,
     to: email,
-    subject: "Verify Your Account - OTP",
-    text: `Your OTP for account verification is ${otp}. It is valid for 5 minutes.`,
+    subject: subject,
+    text: text,
   }).then(() => {
     console.log('Email sent successfully')
     return true
@@ -59,7 +60,10 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       },
     });
 
-    await sendOtpEmail(parsedData.data.username, otp);
+    const subject = "Verify Your Account - OTP"
+    const text = `Your OTP for account verification is ${otp}. It is valid for 5 minutes.`
+    await sendOtpEmail(parsedData.data.username, subject, text);
+    
     
 
     res.status(201).json({
@@ -78,8 +82,9 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
 export const signin = async (req: Request, res: Response): Promise<void> => {
   const parsedData = SigninSchema.safeParse(req.body);
   if (!parsedData.success) {
-    res.status(201).json({
+    res.status(400).json({
       message: "Incorrect Inputs",
+      error: parsedData.error.errors
     });
     return;
   }
@@ -90,6 +95,12 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
       username: parsedData.data?.username,
     },
   });
+  if(!user){
+    res.status(404).json({
+      message: "User not found. Signup first to begin",
+    });
+    return;
+  }
 
   const validUser = await bcrypt.compare(
     parsedData.data.password,
@@ -117,46 +128,48 @@ export const signin = async (req: Request, res: Response): Promise<void> => {
 };
 
 
-export const verifyEmail = async (req: Request, res: Response) => {
-  const email = req.params.email;
 
-  const user = await prismaClient.user.findFirst({
-    where: {
-      username: email
-    },
-  });
-  if(!user){
-    res.status(404).json({
-      message: "User not found",
-    });
-    return;
-  }
 
-  if(user?.isVerified){
-    res.status(200).json({
-      message: "Account already verified",
-    });
-    return;
-  }
+// export const verifyEmail = async (req: Request, res: Response) => {
+//   const email = req.params.email;
 
-  const otp = crypto.randomInt(100000, 999999).toString();
-  try {
-      await sendOtpEmail(email, otp)
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to send email"
-    })
-    return;
-  }
+//   const user = await prismaClient.user.findFirst({
+//     where: {
+//       username: email
+//     },
+//   });
+//   if(!user){
+//     res.status(404).json({
+//       message: "User not found",
+//     });
+//     return;
+//   }
+
+//   if(user?.isVerified){
+//     res.status(200).json({
+//       message: "Account already verified",
+//     });
+//     return;
+//   }
+
+//   const otp = crypto.randomInt(100000, 999999).toString();
+//   try {
+//       await sendOtpEmail(email, otp)
+//   } catch (error) {
+//     res.status(500).json({
+//       message: "Failed to send email"
+//     })
+//     return;
+//   }
   
 
-  res.status(200).json({
-    message: "OTP sent to email. Please verify.",
-    userId: user?.id,
-    otp: otp
-  });
+//   res.status(200).json({
+//     message: "OTP sent to email. Please verify.",
+//     userId: user?.id,
+//     otp: otp
+//   });
 
-}
+// }
 
 export const verifyEmailOTP = async (req: Request, res: Response) => {
   const email = req.body.email;
@@ -203,4 +216,18 @@ export const verifyEmailOTP = async (req: Request, res: Response) => {
   })
 
 
+}
+
+export const sendOTP = async (req: Request, res: Response) => {
+  const email = req.params.email;
+  const otp = req.params.otp;
+
+  const subject = "OTP for signin"
+  const text = `Your OTP for account login is ${otp}. It is valid for 5 minutes.`
+  await sendOtpEmail(email, subject, text);
+
+  res.status(200).json({
+    message: "OTP sent to email. Please verify.",
+    otp: otp
+  })
 }

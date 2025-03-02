@@ -1,8 +1,9 @@
 import Router from "express"
-import { verifyEmail, verifyEmailOTP } from "../controllers/authController";
+import { verifyEmailOTP, sendOTP } from "../controllers/authController";
 
 const router = Router()
 
-router.post('/verifyemail', verifyEmail);
+
 router.post('/verifyotp', verifyEmailOTP);
+router.get('/sendotp/:email/:otp',sendOTP)
 export default router
