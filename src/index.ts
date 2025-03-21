@@ -9,6 +9,7 @@ import analyticsRoutes from "./routes/analyticsRoutes"
 import { authenticateUser } from "./middlewares/authMiddleware";
 import visitLinkRoutes from "./routes/linkVisitRoutes"
 import otpRoutes from "./routes/otpRoutes"
+import os from 'os';
 
 const app = express();
 app.use(cors());
@@ -24,6 +25,8 @@ const port = process.env.PORT || 8000;
 
 export const prismaClient = new PrismaClient();
 
+const memoryUsageInMB = (bytes: number): string => (bytes / 1024 / 1024).toFixed(2);
+
 app.use((req, res, next) => {
     console.log(`🔥 Incoming request: ${req.method} ${req.path}`);
     next();
@@ -38,11 +41,17 @@ app.get('/status',(req: Request, res: Response)=>{
         NODE_ENV: process.env.NODE_ENV, 
         platform: process.platform,    
         architecture: process.arch,     
-        memoryUsage: process.memoryUsage(),
+        memoryUsage: {
+            rss: memoryUsageInMB(process.memoryUsage().rss), 
+            heapTotal: memoryUsageInMB(process.memoryUsage().heapTotal), 
+            heapUsed: memoryUsageInMB(process.memoryUsage().heapUsed), 
+            external: memoryUsageInMB(process.memoryUsage().external), 
+            arrayBuffers: memoryUsageInMB(process.memoryUsage().arrayBuffers), 
+        },
         pid: process.pid,               
         uptime: process.uptime(),       
         version: process.version,       
-        hostname: require('os').hostname() 
+  hostname: os.hostname()
     }
 
     res.status(200).json({

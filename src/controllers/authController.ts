@@ -13,6 +13,11 @@ const generateToken = (userId: number): string => {
 };
 
 const sendOtpEmail = async (email: string, subject: string, text: string) => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  if (!emailRegex.test(email)) {
+    return new Error("Invalid email format");
+  }
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -268,6 +273,14 @@ export const updatePassword = async (req: Request, res: Response) => {
 
 export const sendResetPasswordLink = async (req: Request, res: Response) => {
   const email = req.params.email;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  if (!emailRegex.test(email)) {
+    res.status(400).json({
+      message: "Invalid email format",
+    });
+    return;
+  }
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -281,7 +294,7 @@ export const sendResetPasswordLink = async (req: Request, res: Response) => {
     from: `"Linklytics" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "Reset Password Link",
-    text: `Your password reset link is: https://linklytics-backend.onrender.com/auth/send-reset-password-template/${email}`,
+    text: `Your password reset link is: https://linklytics-backend.onrender.com/api/v1/auth/send-reset-password-template/${email}`,
   }).then(() => {
     console.log('Email sent successfully')
     return true
