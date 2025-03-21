@@ -232,3 +232,74 @@ export const sendOTP = async (req: Request, res: Response) => {
     otp: otp
   })
 }
+
+export const updatePassword = async (req: Request, res: Response) => {
+  const email = req.query.email as string;
+  const password = req.query.password as string;
+
+  const hashedPass = await bcrypt.hash(password, 3);
+
+  const user = await prismaClient.user.findFirst({
+    where: {
+      username: email
+    },
+  });
+  if(!user){
+    res.status(404).json({
+      message: "User not found",
+    });
+    return;
+  }
+
+  await prismaClient.user.update({
+    where: {
+      id: user?.id
+    },
+    data: {
+      password: hashedPass
+    }
+  })
+
+  res.status(200).json({
+    message: "Password updated successfully",
+  })
+
+}
+
+export const sendResetPasswordLink = async (req: Request, res: Response) => {
+  const email = req.params.email;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER, // Your email
+      pass: process.env.EMAIL_PASS, // App password
+    },
+  });
+
+  await transporter.sendMail({
+    from: `"Linklytics" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Reset Password Link",
+    text: `Your password reset link is: https://linklytics-backend.onrender.com/auth/send-reset-password-template/${email}`,
+  }).then(() => {
+    console.log('Email sent successfully')
+    return true
+  }).catch((error) => {
+    console.error("Error sending email:", error);
+    
+  });
+
+  res.status(200).json({
+    message: "Password reset link sent successfully",
+  })
+}
+  
+export const sendResetPasswordTemplate = (req: Request, res: Response)=>{
+  const email = req.params.email;
+  let data = {
+    email : email
+  }
+  res.status(200).render('forget-password', data);
+
+}
