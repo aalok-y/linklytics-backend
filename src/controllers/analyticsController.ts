@@ -124,6 +124,9 @@ export const getAllPortfolioLinkAnalytics = async (req: Request, res: Response) 
   try {
     // Fetch all portfolios with their links
     const portfolios = await prismaClient.portfolio.findMany({
+      where: {
+        userId: (req as any).userId
+      },
       include: {
         portfolioLinks: true
       }
