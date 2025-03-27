@@ -9,6 +9,7 @@ interface Links {
 }
 interface ViewData {
   title: string,
+  description?: string,
   avatar?: string,
   links: Links[]
 }
@@ -258,7 +259,7 @@ export const visitPortfolio = async (req: Request, res: Response): Promise<void>
     
     const portfolio = await prismaClient.portfolio.findUnique({
       where: {
-        endpoint: endpoint
+        endpoint: endpoint,
       },include: {
         portfolioLinks: true
       }
@@ -270,6 +271,7 @@ export const visitPortfolio = async (req: Request, res: Response): Promise<void>
     }
     let data: ViewData = {
       title: portfolio.name,
+      description: portfolio.description as string,
       avatar: portfolio.avatar || '/user.png',
       links: []
     };
